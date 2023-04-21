@@ -50,6 +50,7 @@ class OptionPricingModel:
             return K * exp(-self.r * self.t) * norm.cdf(-d2) - S * norm.cdf(-d1)  # K: strike price
 
 
+
 class OptionData(Asset):
     
     def __init__(self, ticker, start_date, end_date):
@@ -78,10 +79,7 @@ class OptionData(Asset):
         for index, row in data.iterrows():
             # Compute the stock price and strike price
             S = row['Adj Close']
-            if 'c':
-                K = S * 1.15
-            else:
-                K = S * 0.85
+            K = S * 0.95
             # Compute the call and put option prices using the Black-Scholes model
             call_price = self.option_pricing_model.black_scholes('c', S, K)
             put_price = self.option_pricing_model.black_scholes('p', S, K)
@@ -119,31 +117,13 @@ if __name__ == '__main__':
     start_date = '2015-01-01'
     end_date = '2020-12-31'
 
-    days_to_expiry = 252
-
     # Loop over each ticker in the list
     for ticker in tickers:
         # Create an Asset object for the ticker and download its data
         asset = OptionData(ticker, start_date, end_date)
-        asset.download_data()
-        # Compute the stock price and strike price
-        daily_returns = asset.data['Adj Close']
-        s = daily_returns.rolling(window=252).std().iloc[-1]
-
-
-        # Download historical data for the 1-year US Treasury bond (IRX)
-        bond_ticker = "^IRX"
-        bond = yf.Ticker(bond_ticker)
-        bond_data = bond.history(start=start_date, end=end_date)
-
-        # Set r equal to the daily return for the last day in the bond data
-        r = bond_data["Open"][-1]
-
+        
         # Create an OptionData object for the Asset object and set its pricing model
-        asset.set_option_pricing_model(OptionPricingModel(days_to_expiry/252, r, s))
-
+        asset.set_option_pricing_model(OptionPricingModel(1, 0.05, 0.2))        
         # Compute the option prices and save the data to a CSV file in the 'data' directory
         asset.compute_option_prices()
         asset.save_to_csv('data2')
-
-        days_to_expiry -= 1

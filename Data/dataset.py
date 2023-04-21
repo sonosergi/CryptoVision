@@ -3,7 +3,6 @@ import os
 import numpy as np
 import pandas as pd
 from scipy.stats import norm
-import csv
 from datetime import datetime
 from math import log, sqrt, exp
 
@@ -26,24 +25,9 @@ class Asset:
         # Guardar los datos como archivo CSV
         ruta_archivo = os.path.join(ruta_guardado, f"{self.ticker}.csv")
         data.to_csv(ruta_archivo)
-        return data
 
-class BlackScholes(Asset):
-        def __init__(self, data, CallPutFlag, S, K):
-        
-            # Calcula los retornos diarios de la acción subyacente
-            data['returns'] = data['Adj Close'].pct_change()
 
-            # Calcula la desviación estándar de los retornos diarios
-            s = data['returns'].std()
-            d1 = (log(S/K) + (self.r + (self.s ** 2)/2) * self.t)/(self.s * sqrt(self.t))
-            d2 = d1 - self.s * sqrt(self.t)
-            if CallPutFlag == 'c':
-                return S * norm.cdf(d1) - K * exp(-self.r * self.t) * norm.cdf(d2)
-            else:
-                return K * exp(-self.r * self.t) * norm.cdf(-d2) - S * norm.cdf(-d1)
-
-class Data(BlackScholes):
+class Data(Asset):
     
     def __init__(self, ticker, start_date, end_date, t, r, s):
         super().__init__(ticker, start_date, end_date)
@@ -51,17 +35,17 @@ class Data(BlackScholes):
         self.r = r
         self.s = s
 
-    
+    def BlackScholes(self, CallPutFlag, S, K):
+        d1 = (log(S/K) + (self.r + (self.s ** 2)/2) * self.t)/(self.s * sqrt(self.t))
+        d2 = d1 - self.s * sqrt(self.t)
+        if CallPutFlag == 'c':
+            return S * norm.cdf(d1) - K * exp(-self.r * self.t) * norm.cdf(d2)
+        else:
+            return K * exp(-self.r * self.t) * norm.cdf(-d2) - S * norm.cdf(-d1)
     
     def compute_option_prices(self, df):
         call_prices = []
         put_prices = []
-
-        # Calcula los retornos diarios de la acción subyacente
-        df['returns'] = df['Adj Close'].pct_change()
-
-        # Calcula la desviación estándar de los retornos diarios
-        s = df['returns'].std()
 
         for index, row in df.iterrows():
             # Extract stock price and option striking price from the dataframe
@@ -86,10 +70,33 @@ class Data(BlackScholes):
         df.to_csv(file_name, index=False)
 
 
-    
-
+# Descargar y guardar los datos de NVDA
 nvda = Data("NVDA", "2010-01-01", "2022-01-01", t=1, r=0.02, s=0.3)
 nvda.descargar_y_guardar("data")
+
+# Leer los datos de NVDA
 nvda_data = pd.read_csv("data/NVDA.csv")
+
+# Seleccionar las columnas de interés
+nvda_data = nvda_data[['Open', 'High', 'Low', 'Close', 'Adj Close']]
+
+# Calcular los precios de las opciones y agregarlos al dataframe
 nvda_data = nvda.compute_option_prices(nvda_data)
+
+# Guardar los datos en un archivo
 nvda.save_to_csv(nvda_data, "nvda_option_prices.csv")
+
+amd = Data("AMD", "2010-01-01", "2022-01-01", t=1, r=0.02, s=0.3)
+amd.descargar_y_guardar("data")
+
+# Leer los datos de NVDA
+amd_data = pd.read_csv("data/AMD.csv")
+
+# Seleccionar las columnas de interés
+amd_data = amd_data[['Open', 'High', 'Low', 'Close', 'Adj Close']]
+
+# Calcular los precios de las opciones y agregarlos al dataframe
+amd_data = amd.compute_option_prices(amd_data)
+
+# Guardar los datos en un archivo
+amd.save_to_csv(amd_data, "amd_option_prices.csv")

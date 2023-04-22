@@ -3,7 +3,6 @@ import os
 import numpy as np
 import pandas as pd
 from scipy.stats import norm
-from datetime import datetime
 from math import log, sqrt, exp
 
 
@@ -108,7 +107,21 @@ class OptionData(Asset):
         # Save the option data to a CSV file
         self.option_data.to_csv(file_name, index=False)
 
-        
+
+class GetFibonacci:
+    def __init__(self) -> None:
+        pass
+
+    def fibonacci_levels(open_price):
+        high_price = max(open_price)
+        low_price = min(open_price)
+        range_price = high_price - low_price
+        levels = [1.0, 0.786, 0.618, 0.5, 0.382, 0.236, 0.0]
+        fib_levels = []
+        for level in levels:
+            fib_levels.append(high_price - (range_price * level))
+        return fib_levels
+
 
 if __name__ == '__main__':
 
@@ -144,6 +157,16 @@ if __name__ == '__main__':
 
         # Compute the option prices and save the data to a CSV file in the 'data' directory
         asset.compute_option_prices()
+
+        # Calculate Fibonacci levels for each ticker
+        fibonacci_levels = Get_fibonacci_level(daily_returns, 252, 253*3, 252*5)
+        fibonacci_levels.compute_fibonacci_levels()
+
+        # Add Fibonacci levels to the asset data
+        asset.data['Fibonacci_252'] = fibonacci_levels.fibonacci_levels_252
+        asset.data['Fibonacci_253*3'] = fibonacci_levels.fibonacci_levels_253_3
+        asset.data['Fibonacci_252*5'] = fibonacci_levels.fibonacci_levels_252_5
+
         asset.save_to_csv('data2')
 
         days_to_expiry -= 1

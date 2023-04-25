@@ -1,5 +1,5 @@
 from asset import *
-from asset import  fibonacci_levels_and_trend
+from asset import fibonacci_levels_and_trend
 
 # List of tickers for which we want to download option data
 tickers = ['BTC-USD', 'NVDA', 'AMD', 'INTC']

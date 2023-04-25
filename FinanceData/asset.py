@@ -113,6 +113,44 @@ class Asset(Yfinance_download):
         sma_data.columns = ['SMA 126', 'SMA 252', 'SMA 756']
         return sma_data
 
+    def calculate_fibonacci_levels(self):
+        """
+        Agrega las columnas correspondientes para cada período y nivel de Fibonacci
+        """
+        periods = [256, 504, 756]
+        levels = [0, 23.6, 38.2, 50, 61.8, 100]
+
+        for period in periods:
+            start_idx = period - 1
+            end_idx = len(self.data)
+            trend = None
+            fib_levels = []
+            for i in range(start_idx, end_idx):
+                start_trend = max(i - period + 1, 0)
+                end_trend = i + 1
+                trend_data = self.data.iloc[start_trend:end_trend]
+                trend_high = trend_data['Adj Close'].max()
+                trend_low = trend_data['Adj Close'].min()
+                if trend_high > trend_low:
+                    curr_trend = 'Up'
+                else:
+                    curr_trend = 'Down'
+                if trend is None:
+                    trend = curr_trend
+                elif curr_trend != trend:
+                    trend = None
+                    break
+                trend_range = trend_high - trend_low
+                fib_levels = [trend_high - (level/100)*trend_range for level in levels]
+                level_idx = levels.index(50)
+                level_price = trend_low + ((trend_high - trend_low) * 0.5)
+                level_pct = (level_price - trend_low) / trend_range
+                fib_level = fib_levels[level_idx]
+                final_level = trend_low + level_pct * (trend_high - trend_low) + (fib_level - trend_low) * (1 - level_pct)
+                col_name = f'Fibonacci Levels ({period} days)'
+                self.data.loc[i, col_name] = final_level
+            self.data[f'Trend ({period} days)'] = trend
+
     def save_to_csv(self, file_path):
         # Raise error if option data is not computed
         if self.option_data is None:
@@ -125,8 +163,6 @@ class Asset(Yfinance_download):
         file_name = os.path.join(file_path, f"{ticker_file_name}.csv")
         # Save the option data to a CSV file
         self.option_data.to_csv(file_name, index=True)
-
-
 
 if __name__ == '__main__':
 
@@ -164,7 +200,8 @@ if __name__ == '__main__':
         asset.compute_option_prices()
         sma_data = asset.simple_moving_averages()
         asset.option_data = pd.concat([asset.option_data, sma_data], axis=1)
-        asset.save_to_csv('data3')
+        asset.calculate_fibonacci_levels()
+        asset.save_to_csv('data4')
 
         days_to_expiry -= 1
         if days_to_expiry == 0:

@@ -1,5 +1,5 @@
 from asset import *
-
+from asset import  fibonacci_levels_and_trend
 
 # List of tickers for which we want to download option data
 tickers = ['BTC-USD', 'NVDA', 'AMD', 'INTC']
@@ -35,7 +35,8 @@ for ticker in tickers:
     asset.compute_option_prices()
     sma_data = asset.simple_moving_averages()
     asset.option_data = pd.concat([asset.option_data, sma_data], axis=1)
-    asset.save_to_csv('data3')
+    asset.fibonacci_levels_and_trend()
+    asset.save_to_csv('data4')
 
     days_to_expiry -= 1
     if days_to_expiry == 0:

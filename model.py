@@ -1,12 +1,8 @@
-class Asset:
-    def __init__(self, fecha, apertura, máximo, mínimo, var):
-        self.fecha = fecha
-        self.apertura = apertura
-        self.maximo = máximo
-        self.mínimo = mínimo
-        self. var = var
+import pandas as pd
+import tensorflow as tf
+from sklearn.model_selection import train_test_split
 
-class Index(Asset):
-    def __init__(self, fecha, apertura, máximo, mínimo, var):
-        super().__init__(fecha, apertura, máximo, mínimo, var)
+data = pd.read_csv('~/GitHub/BTC/FinanceData/dataset.csv')
 
+X = data.iloc[:, :-1]
+y = data.iloc[:, -1]

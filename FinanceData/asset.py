@@ -35,7 +35,7 @@ class Asset():
         # Compute call and put option prices for each row in data
         for index, row in self.data.iterrows():
             # Compute the stock price and strike price
-            S = row['Adj Close']
+            S = row['Adj Close'] 
             if 'c':
                 K = S * 1.15
             else:
@@ -56,10 +56,10 @@ class Asset():
     def simple_moving_averages(self):
         sma_183 = self.data['Adj Close'].rolling(window=183).mean()
         sma_365 = self.data['Adj Close'].rolling(window=365).mean()
-        sma_1095 = self.data['Adj Close'].rolling(window=1095).mean()
+        sma_1095 = self.data['Adj Close'].rolling(window=730).mean()
         self.data['SMA 183'] = sma_183
         self.data['SMA 365'] = sma_365
-        self.data['SMA 1095'] = sma_1095
+        self.data['SMA 730'] = 730
 
      # Method to calculate Stochastic
     def stochastic(self, k_period=14, d_period=3):

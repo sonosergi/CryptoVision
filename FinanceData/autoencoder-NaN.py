@@ -6,33 +6,33 @@ from tensorflow.keras.models import Model
 from keras.callbacks import TensorBoard
 from sklearn.model_selection import train_test_split
 
-dataset = pd.read_csv("/home/noe/GitHub/BTC/FinanceData/Dataset/original-dataset.csv").drop(index=range(3200))
+
+dataset = pd.read_csv("/home/noe/GitHub/BTC/FinanceData/Dataset/original-dataset.csv").drop(index=np.arange(3600))
 print(dataset.isnull().sum().sum())
-# Iterar por cada fila del DataFrame
+print(dataset.shape)
+print(dataset.info)
+
+print(dataset.isnull().sum().sum())
+
+
+
+# Reemplazar los valores NaN por el promedio de la columna correspondiente
 for col in dataset.columns:
-    null_values = dataset[col].isnull().sum()
-    if null_values > 0:
-        print(f"Columna {col}: {null_values} valores nulos")
-        for i in range(len(dataset)):
-            if pd.isna(dataset[col][i]):
-                prev_mean = dataset[col].iloc[max(0, i-20):i].rolling(window=20, min_periods=1).mean().iloc[-1]
-                next_mean = dataset[col].iloc[i+1:min(i+21, len(dataset))].rolling(window=20, min_periods=1).mean().iloc[-1]
-                if i < 20:
-                    prev_mean = dataset[col].iloc[0:i].mean()
-                else:
-                    prev_mean = dataset[col].iloc[i-20:i].rolling(window=20, min_periods=1).mean().iloc[-1]
+    col_mean = dataset[col].mean()
+    dataset[col] = dataset[col].fillna(col_mean)
 
-                dataset[col][i] = (prev_mean + next_mean) / 2
-        print(f"Columna {col}: {dataset[col].isnull().sum()} valores nulos restantes")
-
-
-"""
 # Dividir el dataset en conjuntos de entrenamiento y prueba
 X_train, X_test = train_test_split(dataset, test_size=0.3, random_state=False)
 
+from sklearn.preprocessing import StandardScaler
+
+# Escalar los datos
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
 
 # Definir el número de neuronas en la capa de entrada, la capa oculta y la capa de salida
-input_dim = 200
+input_dim = X_train_scaled.shape[1]
 hidden_dim = 100
 
 # Definir la entrada
@@ -48,14 +48,23 @@ decoder = Dense(input_dim, activation='sigmoid')(encoder)
 autoencoder = Model(inputs, decoder)
 
 # Compilar el modelo
-autoencoder.compile(optimizer='adam', loss='binary_crossentropy')
+autoencoder.compile(optimizer = tf.keras.optimizers.Adam(learning_rate=0.001),
+                      loss='categorical_crossentropy',
+                      metrics=['accuracy']
+                     )
 
+# Imputar los valores faltantes
+X_train_imputed = autoencoder.predict(X_train_scaled)
+X_test_imputed = autoencoder.predict(X_test_scaled)
 
 # Crear un objeto TensorBoard
 tensorboard = TensorBoard(log_dir='./logs', histogram_freq=1, write_graph=True, write_images=True)
 
-# Entrenar el modelo con el objeto TensorBoard
-autoencoder.fit(X_train, X_test, epochs=10, callbacks=[tensorboard], batch_size=32, validation_data=(X_test, X_test))
+# Entrenar el modelo utilizando el callback
+autoencoder.fit(X_train_scaled, X_train_scaled,
+                epochs=2500,
+                batch_size=15,
+                validation_data=(X_test_scaled, X_test_scaled),
+                callbacks=[tensorboard])
 
-autoencoder.save('autoencoder-NaN.h5')
-"""
+autoencoder.save('autoencoder/autoencoder-NaN.h5')

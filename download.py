@@ -4,18 +4,24 @@ from asset import *
 
 # Define the list of tickers for which we want to download option data
 crypto = ['BTC-USD', 'ETH-USD', 'ADA-USD', 'DOGE-USD', 'XRP-USD', 'LTC-USD', 'XLM-USD', 'ETC-USD']    # Cryptocurrencies
+
 stock_tech = ['NVDA', 'AMD', 'INTC', 'TSLA', 'UEN.F']                                                 # Technology stocks
+
 energy_etf = ['REMX', 'SOXX', 'TAN', 'CIBR', 'ARKK', 'LIT', 'BLOK', 'XLE']                            # ETFs related to energy and materials
-bonds_etf = ['IEF', 'TLT', 'SHY', 'AGG', 'BND', 'LQD', 'HYG', 'MUB', 'TIP', 'VCIT', 
-                     'BIV', 'VGIT', 'BLV', 'VGLT', 'VCLT', 'SCHO', 'SCHR', 'SCHZ', 'SPIB', 
-                     'SPAB', 'MBB', 'JNK', 'BKLN', 'PZA', 'BAB', 'ITM', 'MLN', 'HYD', 'EMB']          # Bond ETFs and similar funds
-index = ['^GSPC', '^DJI', '^IXIC', '^FTSE', '^GDAXI', '^FCHI', '^N225', '^HSI', 
-                      '^BSESN', '^NSEI', '^AXJO', '^GSPTSE', '^BVSP', '^STOXX50E', '^SSMI', 
-                      '^IBEX', '^AXKO', '^KS11', '^AXMM', '^AXEJ', '^RUT', '^NYA', '^VIX']            # Stock indices
+
+bonds_etf = ['IEF', 'TLT', 'SHY', 'AGG', 'BND', 'LQD', 'HYG', 'MUB', 'TIP', 'VCIT',                   #
+                     'BIV', 'VGIT', 'BLV', 'VGLT', 'VCLT', 'SCHO', 'SCHR', 'SCHZ', 'SPIB',            # Bond ETFs and similar funds
+                     'SPAB', 'MBB', 'JNK', 'BKLN', 'PZA', 'BAB', 'ITM', 'MLN', 'HYD', 'EMB']          #
+
+index = ['^GSPC', '^DJI', '^IXIC', '^FTSE', '^GDAXI', '^FCHI', '^N225', '^HSI',                       # 
+                      '^BSESN', '^NSEI', '^AXJO', '^GSPTSE', '^BVSP', '^STOXX50E', '^SSMI',           # Stock indices
+                      '^IBEX', '^AXKO', '^KS11', '^AXMM', '^AXEJ', '^RUT', '^NYA', '^VIX']            #  
+
 currency = ['EURUSD=X', 'JPY=X', 'GBPUSD=X', 'AUDUSD=X', 'CAD=X', 'CHF=X', 'NZDUSD=X', 
-                 'EURJPY=X', 'GBPJPY=X', 'EURGBP=X', 'EURCHF=X', 'HKD=X','SGD=X', 'MXN=X', 
-                 'TRY=X', 'INR=X', 'BRL=X', 'RUB=X','ZAR=X', 'IDR=X', 'THB=X', 'PHP=X', 'KRW=X', 
-                 'USDMYR=X','VND=X', 'TWD=X', 'CLP=X', 'COP=X', 'PEN=X', 'CNY=X']                     # Currency pairs
+                 'EURJPY=X', 'GBPJPY=X', 'EURGBP=X', 'EURCHF=X', 'HKD=X','SGD=X', 'MXN=X',            #
+                 'TRY=X', 'INR=X', 'BRL=X', 'RUB=X','ZAR=X', 'IDR=X', 'THB=X', 'PHP=X', 'KRW=X',      # Currency pairs
+                 'USDMYR=X','VND=X', 'TWD=X', 'CLP=X', 'COP=X', 'PEN=X', 'CNY=X']                     #
+
 
 # Define the start and end dates for the data
 start_date = '2011-03-18'
@@ -44,17 +50,17 @@ for file in ASSETS:
         asset.stochastic()
         asset.simple_moving_averages()
         # Save the data for the Asset object to a CSV file
-        asset.save_to_csv('FinanceData/Assets')
+        asset.save_to_csv('Assets')
         # Decrement days_to_expiry and reset to 365 if it reaches 0
         days_to_expiry -= 1
         if days_to_expiry == 0:
             days_to_expiry = 365
 
 # Define the path to the directory where the CSV files are stored
-path = 'FinanceData/Assets'
+path = 'Assets'
 
 # Create the directory where the output CSV file will be stored if it does not already exist
-output_dir = 'FinanceData/Dataset'
+output_dir = 'Dataset'
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 

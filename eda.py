@@ -4,11 +4,9 @@ from scipy.interpolate import interp1d
 import seaborn as sns
 import matplotlib.pyplot as plt
 import os
-import zipfile
 
-"""
 # Load the dataset and drop rows
-data = pd.read_csv("FinanceData/Dataset/original-dataset.csv").drop(index=np.arange(2429))
+data = pd.read_csv("Dataset/original-dataset.csv").drop(index=np.arange(2429))
 
 # Print dataset information and summary statistics
 print("Dataset information:\n", data.info())
@@ -37,18 +35,17 @@ for column in data.columns:
         data[column][missing_values[column]] = f(np.where(missing_values[column])[0])
 
 # Save the interpolated DataFrame to a CSV file
-output_dir = 'FinalDataset2'
+output_dir = 'FinalDataset'
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
-output_path = os.path.join(output_dir, 'final-dataset2.csv')
+output_path = os.path.join(output_dir, 'final-dataset.csv')
 data.to_csv(output_path, index=False)
 
 """
-
 import zipfile
 
 # Directory to compress
-directory_to_compress = "/home/noe/GitHub/BTC/FinanceData/Dataset/original-dataset.csv"
+directory_to_compress = "Dataset/original-dataset.csv"
 
 # Create a ZipFile object for the output file
 output_file = zipfile.ZipFile("original-dataset.zip", "w", zipfile.ZIP_DEFLATED)
@@ -57,3 +54,4 @@ output_file = zipfile.ZipFile("original-dataset.zip", "w", zipfile.ZIP_DEFLATED)
 
 # Close the ZipFile object
 output_file.close()
+"""

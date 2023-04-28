@@ -8,6 +8,7 @@ import os
 
 # Load the dataset and drop rows
 data = pd.read_csv("Dataset/dataset-pre.csv")
+
 # Print dataset information and summary statistics
 print("Dataset information:\n", data.info())
 print("\nDataset summary statistics:\n", data.describe())
@@ -35,17 +36,15 @@ for column in data.columns:
         data[column][missing_values[column]] = f(np.where(missing_values[column])[0])
 
 # Save the interpolated DataFrame to a CSV file
-output_dir = 'FinalDataset'
+output_dir = 'Dataset'
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 output_path = os.path.join(output_dir, 'final-dataset.csv')
 data.to_csv(output_path, index=False)
 
 """
-### 
-
 # Read the original CSV file into a pandas DataFrame
-df_original = pd.read_csv('/home/noe/GitHub/BTC/Dataset/dataset-pre.csv', header=None)
+df_original = pd.read_csv('Dataset/dataset-pre.csv', header=None)
 
 # Define the indices of the columns to select
 col_indices = [4, 5, 6, 7, 8, 9, 10]
@@ -64,7 +63,6 @@ df_new.to_csv('/home/noe/GitHub/BTC/Dataset/final.csv', index=False, header=Fals
 """
 
 """
-
 import zipfile
 
 # Directory to compress
@@ -86,5 +84,4 @@ row_index, col_index = np.where(data == 15929162910)
 
 # imprimir el índice de fila y columna donde se encuentra el valor
 print("El valor 15929162910 se encuentra en la posición: ({}, {})".format(row_index[0], col_index[0]))
-
 """

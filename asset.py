@@ -1,12 +1,12 @@
-import yfinance as yf
-import os
 import numpy as np
 import pandas as pd
+import yfinance as yf
 from scipy.stats import norm
 from math import log, sqrt, exp
+import os
 
 
-
+# Builder of an asset
 class Asset():
     # Initializing the class instance with Ticker, Start date and End date
     def __init__(self, ticker, start_date, end_date):
@@ -28,6 +28,7 @@ class Asset():
         self.data = self.data.fillna(method='ffill')
         return self.data
         
+    # Method for calculating the price of put and call options with the Black-scholes equation    
     def black_scholes(self, t, r, s):
         # Create empty lists to store call and put option prices
         call_prices = []
@@ -52,7 +53,8 @@ class Asset():
         # Add the call and put option prices to the data frame
         self.data['Call Price'] = call_prices
         self.data['Put Price'] = put_prices
-  
+
+    # Method to calculate the moving averages of 183, 365 and 730 days  
     def simple_moving_averages(self):
         sma_183 = self.data['Adj Close'].rolling(window=183).mean()
         sma_365 = self.data['Adj Close'].rolling(window=365).mean()
@@ -61,7 +63,7 @@ class Asset():
         self.data['SMA 365'] = sma_365
         self.data['SMA 730'] = 730
 
-     # Method to calculate Stochastic
+    # Method to calculate Stochastic
     def stochastic(self, k_period=14, d_period=3):
         # Create 'L'owest and 'H'ighest columns
         self.data['L'] = self.data['Low'].rolling(k_period).min()
@@ -74,6 +76,7 @@ class Asset():
         self.data.drop(['L', 'H'], axis=1, inplace=True)
         return self.data
 
+    # Method to save csv file
     def save_to_csv(self, file_path):
         # Raise error if option data is not computed
         if self.data is None:
